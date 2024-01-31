@@ -23,6 +23,7 @@ checkGuess secret guess
     | secret==guess = Equal
     | secret>guess = Lower
     | secret<guess = Greater
+    | otherwise = error "Unhandled case"
 
 -- checkGuess 100 50 == Lower
 -- checkGuess 100 150 == Greater
@@ -39,6 +40,8 @@ refineGuess secret guess
     | secret>guess = guess+1
     | secret<guess = guess `div` 2
     | secret==guess = guess
+    | otherwise = error "Unhandled case"
+
 
 -- refineGuess 100 50 == 51
 -- refineGuess 100 150 == 75
