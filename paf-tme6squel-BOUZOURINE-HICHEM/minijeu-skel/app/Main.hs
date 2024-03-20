@@ -1,36 +1,28 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
-
 import Control.Monad (unless)
 import Control.Concurrent (threadDelay)
-
 import Data.Set (Set)
 import qualified Data.Set as Set
-
 import Data.List (foldl')
-
 import Foreign.C.Types (CInt (..) )
-
 import SDL
 import SDL.Time (time, delay)
 import Linear (V4(..))
-
 import TextureMap (TextureMap, TextureId (..))
 import qualified TextureMap as TM
-
 import Sprite (Sprite)
 import qualified Sprite as S
-
 import SpriteMap (SpriteMap, SpriteId (..))
 import qualified SpriteMap as SM
-
 import Keyboard (Keyboard)
 import qualified Keyboard as K
-
 import qualified Debug.Trace as T
-
 import Model (GameState)
 import qualified Model as M
+import GHC.Base (when)
+
+-- inspiré de Valeeraz
 
 loadBackground :: Renderer-> FilePath -> TextureMap -> SpriteMap -> IO (TextureMap, SpriteMap)
 loadBackground rdr path tmap smap = do
@@ -66,7 +58,7 @@ gameLoop :: (RealFrac a, Show a) => a -> Renderer -> TextureMap -> SpriteMap -> 
 gameLoop frameRate renderer tmap smap kbd gameState = do
   startTime <- time
   events <- pollEvents
-  let kbd' = K.handleEvents events kbd
+  let (kbd', mouse) = K.handleEvents events kbd
   clear renderer
   --- display background
   S.displaySprite renderer tmap (SM.fetchSprite (SpriteId "background") smap)
@@ -82,9 +74,21 @@ gameLoop frameRate renderer tmap smap kbd gameState = do
   threadDelay $ delayTime * 1000 -- microseconds
   endTime <- time
   let deltaTime = endTime - startTime
-  -- putStrLn $ "Delta time: " <> (show (deltaTime * 1000)) <> " (ms)"
-  -- putStrLn $ "Frame rate: " <> (show (1 / deltaTime)) <> " (frame/s)"
+  when (M.insideGameState mouse gameState)
+    (putStrLn "Touched !")
   --- update du game state
   let gameState' = M.gameStep gameState kbd' deltaTime
   ---
-  unless (K.keypressed KeycodeEscape kbd') (gameLoop frameRate renderer tmap smap kbd' gameState')
+
+  unless (K.keypressed KeycodeEscape kbd') 
+    (if (K.keypressed KeycodeZ kbd')
+      then gameLoop frameRate renderer tmap smap kbd' (M.moveUp gameState')
+      else if (K.keypressed KeycodeS kbd')
+        then gameLoop frameRate renderer tmap smap kbd' (M.moveDown gameState')
+        else if (K.keypressed KeycodeQ kbd')
+          then gameLoop frameRate renderer tmap smap kbd' (M.moveLeft gameState')
+          else if (K.keypressed KeycodeD kbd')
+            then gameLoop frameRate renderer tmap smap kbd' (M.moveRight gameState')
+            else gameLoop frameRate renderer tmap smap kbd' gameState'
+      )
+  

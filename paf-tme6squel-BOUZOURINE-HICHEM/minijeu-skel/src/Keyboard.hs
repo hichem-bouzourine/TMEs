@@ -10,24 +10,29 @@ import qualified Data.Set as S
 
 type Keyboard = Set Keycode
 
+type Mouse = Maybe (V2 Int)
+
 -- | création de la structure d'état de clavier (vide)
 createKeyboard :: Keyboard
 createKeyboard = S.empty
 
-handleEvent :: Event -> Keyboard -> Keyboard
-handleEvent event kbd =
+handleEvent :: Event -> (Keyboard, Mouse) -> (Keyboard, Mouse)
+handleEvent event (kbd, _) =
   case eventPayload event of
     KeyboardEvent keyboardEvent ->
       if keyboardEventKeyMotion keyboardEvent == Pressed
-      then S.insert (keysymKeycode (keyboardEventKeysym keyboardEvent)) kbd
+      then (S.insert (keysymKeycode (keyboardEventKeysym keyboardEvent)) kbd, Nothing)
       else if keyboardEventKeyMotion keyboardEvent == Released
-           then S.delete (keysymKeycode (keyboardEventKeysym keyboardEvent)) kbd
-           else kbd
-    _ -> kbd
+           then (S.delete (keysymKeycode (keyboardEventKeysym keyboardEvent)) kbd, Nothing)
+           else (kbd, Nothing)
+    MouseButtonEvent mouseButton ->
+            let P coordinates = fmap fromIntegral (mouseButtonEventPos mouseButton) in
+                (kbd, Just coordinates)
+    _ -> (kbd, Nothing)
 
--- | prise en compte des événements SDL2 pour mettre à jour l'état du clavier
-handleEvents :: [Event] -> Keyboard -> Keyboard
-handleEvents events kbd = foldl' (flip handleEvent) kbd events
+-- | prise en compte des événements SDL2 pour mettre à jour l'état du clavier/souris
+handleEvents :: [Event] -> Keyboard ->  (Keyboard, Mouse)
+handleEvents events kbd = foldl' (flip handleEvent) (kbd, Nothing) events
 
 -- | quelques noms de *keycode*
 keycodeName :: Keycode -> Char

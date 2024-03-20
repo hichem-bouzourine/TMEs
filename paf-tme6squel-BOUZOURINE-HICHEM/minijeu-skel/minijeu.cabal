@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
+-- This file has been generated from package.yaml by hpack version 0.36.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 91121fe7f03a06dedb0120525b6c15f7a81bebfc2beb377140ba594b6a7effed
+-- hash: f60d16a6847ac6552c3d7b57e53ec5b8f8d22520ac7fc018619bfe373444f096
 
 name:           minijeu
 version:        0.1.0.0
@@ -29,6 +29,7 @@ library
   exposed-modules:
       Keyboard
       Model
+      Mouse
       Sprite
       SpriteMap
       TextureMap

@@ -16,16 +16,31 @@ initGameState :: GameState
 initGameState = GameState 200 300 4
 
 moveLeft :: GameState -> GameState
-moveLeft gs = gs -- A MODIFIER
+moveLeft gs@(GameState x _ s) 
+  | x > 0 = gs{persoX = x - s}
+  | otherwise = gs
 
 moveRight :: GameState -> GameState
-moveRight gs = gs -- A MODIFIER
+moveRight gs@(GameState x _ s) 
+  | x < 540 = gs{persoX = x + s}
+  | otherwise = gs
                               
 moveUp :: GameState -> GameState
-moveUp gs = gs -- A MODIFIER
+moveUp gs@(GameState _ y s) 
+  | y > 0 = gs{persoY = y - s}
+  | otherwise = gs
 
 moveDown :: GameState -> GameState
-moveDown gs = gs -- A MODIFIER
+moveDown gs@(GameState _ y s) 
+  | y < 380 = gs{persoY = y + s}
+  | otherwise = gs
+
+-- source d'inspiration : github
+insideGameState :: Maybe (V2 Int) -> GameState -> Bool 
+insideGameState coords gs@(GameState px py _) = 
+  case coords of
+    Just (V2 x y) -> px <= x && x <= (px + 100) && py <= y && y <= (py + 100)
+    Nothing -> False
 
 gameStep :: RealFrac a => GameState -> Keyboard -> a -> GameState
 gameStep gstate kbd deltaTime =
