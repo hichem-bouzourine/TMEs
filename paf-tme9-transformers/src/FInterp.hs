@@ -42,10 +42,19 @@ showMachine dbg = ExceptT $ StateT $ \fm -> do
 -- | interprétation des primitives
 interpPrim :: FPrimitive -> Forth
 interpPrim POP = hoistPure $ fpop
+interpPrim DUP = hoistPure $ fdup
 interpPrim EMIT = do
   x <- hoistPure fpop
   liftIO $ putStr (show x)
   return FNone
+
+-- interpOper :: Foperation -> Forth
+-- interpOper PLUS = +
+-- interpOper MINUS = -
+-- interpOper TIMES = *
+-- interpOper DEVISE = /
+-- interOper SQUARE = square
+
 
 -- | interpretation des instructions
 interpInstr :: FInstr -> Forth
@@ -81,4 +90,3 @@ execProg dbg prog = do
   hoistPure $ fload prog
   x <- interpreter dbg
   return x
-

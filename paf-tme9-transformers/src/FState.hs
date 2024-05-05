@@ -43,13 +43,23 @@ instance Show FValue where
 data FInstr =
   FVal FValue         -- une valeur comme instruction
   | FPrim FPrimitive  -- une primitive
+  -- | FOp Foperation
   | FWord String      -- un mot
   | FDef String FProgram -- une définition de mot
   deriving (Show, Eq)
 
+-- data Foperation =
+--   PLUS
+--   |MINUS
+--   |TIMES
+--   |DEVISE
+--   |SQUARE
+--   deriving (Show, Eq)
+
 -- | Les primitives
 data FPrimitive =
-  POP
+  DUP
+  | POP
   | EMIT
   deriving (Show, Eq)
 
@@ -86,6 +96,12 @@ initialFMachine = FMachine {
   fStack = []
   , fWords = M.fromList [("POP", mkSeq [[FPrim POP]])
                         ,("EMIT", mkSeq [[FPrim EMIT]])
+                        ,("DUP", mkSeq [[FPrim DUP]])
+                        -- ,("+", mkSeq [[FOp PLUS]])
+                        -- ,("-", mkSeq [[FOp MINUS]])
+                        -- ,("*", mkSeq [[FOp TIMES]])
+                        -- ,("/", mkSeq [[FOp DEVISE]])
+                        -- ,("SQUARE", mkSeq [[FOp SQUARE]])
                         ]
   , fProg = []
   }
@@ -105,6 +121,11 @@ fnext fm@(FMachine { fProg = (x:xs) }) = (Right $ FNext x, fm { fProg = xs })
 fpop :: FMachine -> (ForthResult, FMachine)
 fpop fm@(FMachine { fStack = [] }) = (Left FErrStackEmpty, fm)
 fpop fm@(FMachine { fStack = (x:xs) }) = (Right x, fm { fStack = xs })
+
+-- | DUP
+fdup :: FMachine -> (ForthResult, FMachine)
+fdup fm@(FMachine { fStack = [] }) = (Left FErrStackEmpty, fm)
+fdup fm@(FMachine { fStack = (x:xs) }) = (Right FNone, fm { fStack = x:x:xs })
 
 -- | empiler
 fpush :: FValue -> FMachine -> (ForthResult, FMachine)
@@ -128,5 +149,4 @@ fdef word prog fm@(FMachine { fWords = fws }) =
   (Right FNone, fm { fWords = case M.lookup word fws of
                                 Nothing -> M.insert word (S.singleton prog) fws 
                                 Just progs -> M.insert word (prog :<| progs) fws })
-
 
