@@ -1,0 +1,18 @@
+/home/hichem/.ghcup/ghc/9.6.3/lib/ghc-9.6.3/lib/x86_64-linux-ghc-9.6.3/rts-1.0.2/include/ghcversion.h:
+  hash: 9ac4cd6dcf20b31fc6e9eefbda1d924d33786bc197a79b0e6947ed7129581019
+? /home/hichem/Desktop/M1/S2/PAF/TMEs/paf-tme9-transformers/.stack-work/dist/x86_64-linux/ghc-9.6.3/build/paf-TME9-Forthtran-test/autogen/Paths_paf_TME9_Forthtran.hs
+: hash: 28f4b23e45117a4eb76824b753819dc77ef929770d8af555d3503fc9582abda7
+? /home/hichem/Desktop/M1/S2/PAF/TMEs/paf-tme9-transformers/.stack-work/dist/x86_64-linux/ghc-9.6.3/build/paf-TME9-Forthtran-test/autogen/cabal_macros.h
+: hash: bde25ca0be13c23dc5d630546064dd9b1f4e8b4bebd2667dfb1593a43f48bc89
+/home/hichem/Desktop/M1/S2/PAF/TMEs/paf-tme9-transformers/ChangeLog.md:
+  hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+/home/hichem/Desktop/M1/S2/PAF/TMEs/paf-tme9-transformers/README.md:
+  hash: 705a3061e76f80f957007452c0bad6caf62e0293025968ca91ac3749eeea206f
+/home/hichem/Desktop/M1/S2/PAF/TMEs/paf-tme9-transformers/package.yaml:
+  hash: 6af860811cc702ccc723ef84edfd3ffb00e52ec7f521e103f682cdebf6a87800
+/home/hichem/Desktop/M1/S2/PAF/TMEs/paf-tme9-transformers/paf-TME9-Forthtran.cabal:
+  hash: 98a2ce1983995a9501d4e469c18d2187e18d8fbb3fd68f85514c81ef8fb3a22a
+/home/hichem/Desktop/M1/S2/PAF/TMEs/paf-tme9-transformers/test/Spec.hs:
+  hash: ef8d1c0c14bd7951b5db43ad0bc2b1c46ef3c248d621c644d3ddb98bc2a08ecc
+/usr/include/stdc-predef.h:
+  hash: cb08cd5d4cc059a90833ac48a284d25016e8d56ded8ad4cd98d8ac59cc5053f3
