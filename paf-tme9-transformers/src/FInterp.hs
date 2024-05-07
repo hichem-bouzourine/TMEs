@@ -9,6 +9,7 @@ import System.IO (hFlush, stdout)
 import Data.Functor.Identity (Identity (..))
 -- import Control.Monad.Trans.Identity
 import Control.Monad
+import Control.Monad (mplus)
 import Control.Monad.IO.Class
 import Control.Monad.Trans.Class
 import Control.Monad.Trans.Except
@@ -48,20 +49,43 @@ interpPrim EMIT = do
   liftIO $ putStr (show x)
   return FNone
 
--- interpOper :: Foperation -> Forth
--- interpOper PLUS = +
+interpOper :: Foperation -> Forth
+interpOper PLUS = hoistPure fplus
+interpOper MINUS = hoistPure fminus
 -- interpOper MINUS = -
 -- interpOper TIMES = *
 -- interpOper DEVISE = /
 -- interOper SQUARE = square
+
+-- | Interprétation de l'instruction IF
+interpIf :: Forth
+interpIf = do
+  cond <- hoistPure fpop
+  case cond of
+    FBool True -> return FNone
+    FBool False -> return FNone -- on saute le ELSE
+    _ -> hoistError $ FErrNotImplemented "Non-boolean condition in IF"
+
+-- | Interprétation de l'instruction ELSE
+interpElse :: Forth
+interpElse = return FNone
+
+-- | Interprétation de l'instruction THEN
+interpThen :: Forth
+interpThen = return FNone
 
 
 -- | interpretation des instructions
 interpInstr :: FInstr -> Forth
 interpInstr (FVal x) = hoistPure $ fpush x
 interpInstr (FPrim prim) = interpPrim prim
+interpInstr (FOp oper) = interpOper oper
 interpInstr (FWord w) = hoistPure $ fword w
 interpInstr (FDef w prog) = hoistPure $ fdef w prog
+interpInstr (FWord "IF") = interpIf
+interpInstr (FWord "ELSE") = interpElse
+interpInstr (FWord "THEN") = interpThen
+
 
 -- | gestion du compteur de programme (prochain instruction)
 interpNext :: Bool -> Forth

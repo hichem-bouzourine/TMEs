@@ -43,18 +43,24 @@ instance Show FValue where
 data FInstr =
   FVal FValue         -- une valeur comme instruction
   | FPrim FPrimitive  -- une primitive
-  -- | FOp Foperation
+  | FOp Foperation    -- une opération
   | FWord String      -- un mot
   | FDef String FProgram -- une définition de mot
+  -- if else then
+  | FIf 
+  | FElse
+  | FThen
+  | FTrue
+  | FFalse
   deriving (Show, Eq)
 
--- data Foperation =
---   PLUS
---   |MINUS
---   |TIMES
---   |DEVISE
---   |SQUARE
---   deriving (Show, Eq)
+data Foperation =
+  PLUS
+  | MINUS
+  | TIMES
+  | DEVISE
+  | SQUARE
+  deriving (Show, Eq)
 
 -- | Les primitives
 data FPrimitive =
@@ -97,11 +103,14 @@ initialFMachine = FMachine {
   , fWords = M.fromList [("POP", mkSeq [[FPrim POP]])
                         ,("EMIT", mkSeq [[FPrim EMIT]])
                         ,("DUP", mkSeq [[FPrim DUP]])
-                        -- ,("+", mkSeq [[FOp PLUS]])
-                        -- ,("-", mkSeq [[FOp MINUS]])
-                        -- ,("*", mkSeq [[FOp TIMES]])
-                        -- ,("/", mkSeq [[FOp DEVISE]])
-                        -- ,("SQUARE", mkSeq [[FOp SQUARE]])
+                        ,("+", mkSeq [[FOp PLUS]])
+                        ,("-", mkSeq [[FOp MINUS]])
+                        ,("*", mkSeq [[FOp TIMES]])
+                        ,("/", mkSeq [[FOp DEVISE]])
+                        ,("SQUARE", mkSeq [[FOp SQUARE]])
+                        ,("IF", mkSeq [[FWord "IF"]])
+                        ,("ELSE", mkSeq [[FWord "ELSE"]])
+                        ,("THEN", mkSeq [[FWord "THEN"]])
                         ]
   , fProg = []
   }
@@ -150,3 +159,34 @@ fdef word prog fm@(FMachine { fWords = fws }) =
                                 Nothing -> M.insert word (S.singleton prog) fws 
                                 Just progs -> M.insert word (prog :<| progs) fws })
 
+fplus :: FMachine -> (ForthResult, FMachine)
+fplus fm@(FMachine { fStack = [] }) = (Left FErrStackEmpty, fm)
+fplus fm@(FMachine { fStack = (x : y : xs) }) =
+  case (x, y) of
+    (FInt a, FInt b) -> (Right FNone, fm { fStack = FInt (a + b) : xs })
+    (FDouble a, FDouble b) -> (Right FNone, fm { fStack = FDouble (a + b) : xs })
+    (FInt a, FDouble b) -> (Right FNone, fm { fStack = FDouble (fromIntegral a + b) : xs })
+    (FDouble a, FInt b) -> (Right FNone, fm { fStack = FDouble (a + fromIntegral b) : xs })
+    _ -> (Left $ FErrNotImplemented $ "PLUS: " <> show x <> " " <> show y, fm)
+
+fminus :: FMachine -> (ForthResult, FMachine)
+fminus fm@(FMachine { fStack = [] }) = (Left FErrStackEmpty, fm)
+fminus fm@(FMachine { fStack = (x : y : xs) }) =
+  case (x, y) of
+    (FInt a, FInt b) -> (Right FNone, fm { fStack = FInt (a - b) : xs })
+    (FDouble a, FDouble b) -> (Right FNone, fm { fStack = FDouble (a - b) : xs })
+    (FInt a, FDouble b) -> (Right FNone, fm { fStack = FDouble (fromIntegral a - b) : xs })
+    (FDouble a, FInt b) -> (Right FNone, fm { fStack = FDouble (a - fromIntegral b) : xs })
+    _ -> (Left $ FErrNotImplemented $ "MINUS: " <> show x <> " " <> show y, fm)
+
+fif :: FMachine -> (ForthResult, FMachine)
+fif fm@(FMachine { fStack = [] }) = (Left FErrStackEmpty, fm)
+fif fm@(FMachine { fStack = (FBool b : xs) }) =
+  if b then (Right FNone, fm)
+  else (Right FNone, fm { fProg = [] })
+
+felse :: FMachine -> (ForthResult, FMachine)
+felse fm = (Right FNone, fm)
+
+fthen :: FMachine -> (ForthResult, FMachine)
+fthen fm = (Right FNone, fm)
